@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hallo :)</title>
+  </head>
+  <body>
+    <input type="text" id="nameInp" /><br />
+    <input type="text" id="messageInp" />
+    <button id="sendBtn">Send</button>
+    <p id="textP"></p>
+    <script>
+      const nameInp = document.getElementById("nameInp");
+      const messageInp = document.getElementById("messageInp");
+      const sendBtn = document.getElementById("sendBtn");
+      const textP = document.getElementById("textP");
+
+      const url = window.location.href;
+      textP.innerHTML = url;
+
+      sendBtn.onclick = function () {
+        let xhr = new XMLHttpRequest();
+        xhr.open("POST", url + "messages/");
+
+        xhr.setRequestHeader("Accept", "application/json");
+        xhr.setRequestHeader("Content-Type", "application/json");
+
+        xhr.onload = () => console.log(xhr.responseText);
+
+        let data = `{
+            "name": "${nameInp.value}",
+            "message": "${messageInp.value}"
+        }`;
+
+        xhr.send(data);
+
+        xhr.onreadystatechange(getMessages());
+      };
+
+      const interval = 1000;
+      setInterval(() => {
+        getMessages();
+      }, interval);
+
+      function getMessages() {
+        let xhr = new XMLHttpRequest();
+        xhr.open("GET", url + "messages/");
+        xhr.send();
+        xhr.onreadystatechange = (e) => {
+          if (xhr.readyState === 4) {
+            updateMessages(JSON.parse(xhr.responseText));
+          }
+        };
+      }
+
+      function updateMessages(a) {
+        const messages = a;
+        let formatted = "";
+        for (let i = messages.length - 1; i >= 0; i--) {
+          let message = messages[i];
+          if (message.name !== "") {
+            formatted += `${message.name}: ${message.message}<br/>`;
+          }
+        }
+        textP.innerHTML = formatted;
+      }
+    </script>
+  </body>
+</html>
