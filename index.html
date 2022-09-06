@@ -18,9 +18,24 @@
       const textP = document.getElementById("textP");
 
       const url = window.location.href;
-      textP.innerHTML = url;
 
       sendBtn.onclick = function () {
+        sendMessage();
+      };
+
+      messageInp.addEventListener("keypress", function (event) {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          getMessages();
+        }
+      });
+
+      const interval = 1000;
+      setInterval(() => {
+        getMessages();
+      }, interval);
+
+      function sendMessage() {
         let xhr = new XMLHttpRequest();
         xhr.open("POST", url + "messages/");
 
@@ -36,13 +51,10 @@
 
         xhr.send(data);
 
-        xhr.onreadystatechange(getMessages());
-      };
-
-      const interval = 1000;
-      setInterval(() => {
-        getMessages();
-      }, interval);
+        xhr.onreadystatechange = () => {
+          getMessages();
+        };
+      }
 
       function getMessages() {
         let xhr = new XMLHttpRequest();
@@ -66,6 +78,8 @@
         }
         textP.innerHTML = formatted;
       }
+
+      getMessages();
     </script>
   </body>
 </html>
